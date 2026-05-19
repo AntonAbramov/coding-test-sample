@@ -13,6 +13,14 @@ body[data-theme='dark'] {
 }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #5750ec;
+  outline-offset: 2px;
+}
 .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
 .sidebar { background: #111827; color: white; padding: 24px; display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; height: 100vh; }
 .brand-block { display: flex; align-items: center; gap: 12px; }
@@ -27,8 +35,20 @@ button { cursor: pointer; }
 .search-box { flex: 1; }
 .search-box input, .ticket-composer input, .settings-form input, .settings-form select, .billing-summary input, .toolbar select { width: 100%; border: 1px solid #d0d5dd; border-radius: 14px; padding: 12px 14px; background: white; }
 .theme-toggle, .primary-btn, .toolbar button, .ticket-composer button, .invoice-card button, .person-card button { border: 0; border-radius: 14px; padding: 12px 16px; background: #5750ec; color: white; }
+button:disabled { opacity: .55; cursor: not-allowed; }
 .icon-only { border: 0; background: transparent; color: inherit; }
 .menu-btn, .close-mobile { display: none; }
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(15, 23, 42, .45);
+  z-index: 19;
+  cursor: pointer;
+}
 .page-frame { padding: 30px; }
 .page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 24px; }
 .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; color: #5750ec; font-weight: 800; }
@@ -40,7 +60,7 @@ h2 { margin-top: 0; }
 .stat-card { padding: 20px; }
 .stat-card p { color: #667085; margin: 0 0 12px; }
 .stat-card strong { font-size: 30px; display: block; }
-.good { color: #047857; } .bad { color: #b42318; }
+.good { color: #047857; } .bad { color: #b42318; } .neutral { color: #667085; }
 .content-grid { display: grid; gap: 18px; margin-top: 18px; }
 .two-col { grid-template-columns: 1.6fr .9fr; }
 .panel { padding: 22px; }
@@ -48,15 +68,16 @@ h2 { margin-top: 0; }
 .health-bar, .meter { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
 .health-bar i, .meter span { display: block; height: 100%; background: #5750ec; }
 .notes-panel textarea { min-height: 180px; width: 100%; border-radius: 18px; border: 1px solid #d0d5dd; padding: 14px; }
-.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; white-space: nowrap }
 .table-wrap { overflow: auto; }
-.data-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table.compact { min-width: 0; }
 th, td { padding: 14px; border-bottom: 1px solid #e5e7eb; text-align: left; }
 .danger-row { background: #fff1f3; }
 .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .person-card { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; padding: 18px; align-items: center; }
 .avatar { width: 52px; height: 52px; border-radius: 18px; background: #ddd6fe; display: grid; place-items: center; font-weight: 900; }
-.chart-panel { height: 360px; }
+.chart-panel { height: 360px; margin-bottom: 18px; } // But I would better add mb-6 or mb-8 to the section, but on other pages you have 18px hardcoded so I followed your pattern.
 .bar-chart { height: 260px; display: flex; align-items: end; gap: 16px; padding: 20px 0; }
 .chart-bar { width: 80px; background: #5750ec; color: white; border: 0; border-radius: 14px 14px 4px 4px; position: relative; min-height: 20px; }
 .chart-bar span { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); color: #475467; }
@@ -71,16 +92,49 @@ th, td { padding: 14px; border-bottom: 1px solid #e5e7eb; text-align: left; }
 .toast { padding: 12px; background: #ecfdf3; border-radius: 14px; }
 .ticket-composer { display: flex; gap: 12px; margin-bottom: 16px; }
 .ticket-list { display: grid; gap: 12px; }
-.ticket { padding: 18px; display: flex; justify-content: space-between; }
+.ticket { padding: 18px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.support-guide ul { margin: 0; padding-left: 20px; color: #667085; }
+.support-guide li + li { margin-top: 8px; }
 .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.62); display: grid; place-items: center; z-index: 30; }
 .modal-card { background: white; color: #101828; padding: 28px; width: min(520px, 92vw); border-radius: 28px; position: relative; }
 .modal-close { position: absolute; right: 16px; top: 16px; border: 0; background: #f2f4f7; border-radius: 999px; width: 34px; height: 34px; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.empty-state { color: #667085; padding: 24px; text-align: center; }
+.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.field-error { color: #b42318; font-size: 14px; margin: 0; }
+.modal-card input { width: 100%; margin: 12px 0 16px; }
+body[data-theme='dark'] .modal-card { background: #111827; color: #e5e7eb; }
+body[data-theme='dark'] .modal-close { background: #1f2937; color: #e5e7eb; }
+
 @media (max-width: 900px) {
   .app-shell { grid-template-columns: 1fr; }
-  .sidebar { position: fixed; transform: translateX(-120%); transition: transform .2s; z-index: 20; width: 290px; }
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-120%);
+    transition: transform .2s ease;
+    z-index: 25;
+    width: min(290px, 88vw);
+    height: 100vh;
+  }
   .sidebar--open { transform: translateX(0); }
-  .menu-btn, .close-mobile { display: inline-grid; }
+  .sidebar-backdrop { display: block; }
+  .menu-btn, .close-mobile { display: inline-grid; place-items: center; }
+  .close-mobile { margin-left: auto; }
   .stats-grid, .two-col, .card-grid { grid-template-columns: 1fr; }
-  .topbar { padding: 12px; }
+  .topbar { padding: 12px 16px; gap: 12px; }
   .page-frame { padding: 18px; }
+  .bar-chart { overflow-x: auto; padding-bottom: 36px; }
+  .chart-bar { min-width: 48px; width: 48px; flex-shrink: 0; }
+  .billing-summary { flex-direction: column; align-items: stretch; gap: 12px; }
 }
