@@ -63,6 +63,7 @@ h2 { margin-top: 0; }
 .good { color: #047857; } .bad { color: #b42318; } .neutral { color: #667085; }
 .content-grid { display: grid; gap: 18px; margin-top: 18px; }
 .two-col { grid-template-columns: 1.6fr .9fr; }
+.split-50 { grid-template-columns: 1fr 1fr; align-items: start; }
 .panel { padding: 22px; }
 .health-row { display: grid; grid-template-columns: 180px 1fr 50px; gap: 12px; align-items: center; margin: 14px 0; }
 .health-bar, .meter { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
@@ -77,7 +78,7 @@ th, td { padding: 14px; border-bottom: 1px solid #e5e7eb; text-align: left; }
 .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .person-card { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; padding: 18px; align-items: center; }
 .avatar { width: 52px; height: 52px; border-radius: 18px; background: #ddd6fe; display: grid; place-items: center; font-weight: 900; }
-.chart-panel { height: 360px; margin-bottom: 18px; } // But I would better add mb-6 or mb-8 to the section, but on other pages you have 18px hardcoded so I followed your pattern.
+.chart-panel { height: 360px; }
 .bar-chart { height: 260px; display: flex; align-items: end; gap: 16px; padding: 20px 0; }
 .chart-bar { width: 80px; background: #5750ec; color: white; border: 0; border-radius: 14px 14px 4px 4px; position: relative; min-height: 20px; }
 .chart-bar span { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); color: #475467; }
@@ -131,7 +132,7 @@ body[data-theme='dark'] .modal-close { background: #1f2937; color: #e5e7eb; }
   .sidebar-backdrop { display: block; }
   .menu-btn, .close-mobile { display: inline-grid; place-items: center; }
   .close-mobile { margin-left: auto; }
-  .stats-grid, .two-col, .card-grid { grid-template-columns: 1fr; }
+  .stats-grid, .two-col, .split-50, .card-grid { grid-template-columns: 1fr; }
   .topbar { padding: 12px 16px; gap: 12px; }
   .page-frame { padding: 18px; }
   .bar-chart { overflow-x: auto; padding-bottom: 36px; }

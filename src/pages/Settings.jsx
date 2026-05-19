@@ -51,6 +51,7 @@ export default function SettingsPage() {
         <label className="checkbox-line">
           <input
             type="checkbox"
+            className="!w-[20px]"
             checked={settings.emails}
             onChange={(event) => setSettings({ ...settings, emails: event.target.checked })}
           />
