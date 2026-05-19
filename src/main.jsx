@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Home, BarChart3, Users, Settings, HelpCircle, ShoppingBag, Menu, X } from 'lucide-react'
+import { Home, BarChart3, Users, Settings, HelpCircle, FolderKanban, CreditCard, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import './styles/tailwind.css'
 import './styles/global.scss'
@@ -15,17 +15,18 @@ import Support from './pages/Support.jsx'
 
 const routes = [
   { path: '/', label: 'Dashboard', icon: Home, component: Dashboard },
-  { path: '/projects', label: 'Projects', icon: ShoppingBag, component: Projects },
+  { path: '/projects', label: 'Projects', icon: FolderKanban, component: Projects },
   { path: '/team', label: 'Team', icon: Users, component: Team },
   { path: '/reports', label: 'Reports', icon: BarChart3, component: Reports },
-  { path: '/billing', label: 'Billing', icon: ShoppingBag, component: Billing },
+  { path: '/billing', label: 'Billing', icon: CreditCard, component: Billing },
   { path: '/settings', label: 'Settings', icon: Settings, component: SettingsPage },
   { path: '/support', label: 'Support', icon: HelpCircle, component: Support }
 ]
 
 function readHashPath() {
-  // BUG: query strings break route matching in some cases, e.g. #/team?tab=active
-  return window.location.hash.replace('#', '') || '/'
+  const raw = window.location.hash.replace(/^#/, '') || '/'
+  const pathOnly = raw.split('?')[0].split('#')[0] || '/'
+  return pathOnly.startsWith('/') ? pathOnly : `/${pathOnly}`
 }
 
 function App() {
@@ -37,8 +38,7 @@ function App() {
   useEffect(() => {
     const onHashChange = () => setPath(readHashPath())
     window.addEventListener('hashchange', onHashChange)
-    // BUG: cleanup removes wrong listener reference, causing duplicate listeners during hot reloads
-    return () => window.removeEventListener('hashchange', () => onHashChange())
+    return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
   useEffect(() => {
@@ -47,13 +47,22 @@ function App() {
   }, [theme])
 
   const currentRoute = useMemo(() => {
-    return routes.find((route) => route.path === path) || routes[0]
+    const normalized = path === '/' ? '/' : path.replace(/\/$/, '')
+    return routes.find((route) => route.path === normalized) || routes[0]
   }, [path])
 
   const Page = currentRoute.component
 
   return (
     <div className="app-shell">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <aside className={clsx('sidebar', sidebarOpen && 'sidebar--open')}>
         <div className="brand-block">
           <div className="brand-logo">N</div>
@@ -61,19 +70,20 @@ function App() {
             <strong>Northstar</strong>
             <span>Ops Console</span>
           </div>
-          <button className="icon-only close-mobile" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
+          <button type="button" className="icon-only close-mobile" onClick={() => setSidebarOpen(false)} aria-label="Close menu">
             <X size={18} />
           </button>
         </div>
         <nav className="nav-list" aria-label="Main navigation">
-          {routes.map((route, index) => {
+          {routes.map((route) => {
             const Icon = route.icon
             return (
               <a
-                key={route.label + index}
-                className={clsx('nav-item', path === route.path && 'active')}
+                key={route.path}
+                className={clsx('nav-item', currentRoute.path === route.path && 'active')}
                 href={`#${route.path}`}
                 onClick={() => setSidebarOpen(false)}
+                aria-current={currentRoute.path === route.path ? 'page' : undefined}
               >
                 <Icon size={18} />
                 <span>{route.label}</span>
@@ -89,18 +99,19 @@ function App() {
 
       <main className="main-area">
         <header className="topbar">
-          <button className="icon-only menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Open menu">
+          <button type="button" className="icon-only menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? 'Close menu' : 'Open menu'} aria-expanded={sidebarOpen}>
             <Menu size={20} />
           </button>
           <div className="search-box">
             <input
+              type="search"
               value={globalSearch}
               onChange={(event) => setGlobalSearch(event.target.value)}
-              placeholder="Search everything..."
+              placeholder="Search projects, team, invoices…"
+              aria-label="Search dashboard"
             />
-            {/* BUG: global search text is not used consistently by pages */}
           </div>
-          <button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          <button type="button" className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-pressed={theme === 'dark'}>
             {theme === 'dark' ? 'Light' : 'Dark'} mode
           </button>
         </header>
